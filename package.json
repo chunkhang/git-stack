@@ -1,0 +1,42 @@
+{
+  "name": "git-stack",
+  "version": "1.0.0",
+  "description": "A more user-friendly git stash",
+  "bin": {
+    "git-stack": "./bin/index.js"
+  },
+  "keywords": [
+    "git",
+    "stack"
+  ],
+  "author": {
+    "name": "Marcus Mu",
+    "email": "chunkhang@gmail.com",
+    "url": "https://www.chunkhang.com"
+  },
+  "homepage": "https://github.com/chunkhang/git-stack",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chunkhang/git-stack.git"
+  },
+  "bugs": "https://github.com/chunkhang/git-stack/issues",
+  "license": "Unlicense",
+  "engines": {
+    "node": ">=8"
+  },
+  "scripts": {
+    "pretest": "npm run lint",
+    "test": "echo 'No test yet'",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "commander": "^2.19.0",
+    "inquirer": "^6.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.12.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  }
+}
