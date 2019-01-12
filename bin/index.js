@@ -3,7 +3,8 @@
 const inquirer = require('inquirer')
 const autocomplete = require('inquirer-autocomplete-prompt')
 
-const { choices, actions } = require('../lib')
+const { choices, actions } = require('../lib/actions')
+const utils = require('../lib/utils')
 
 const includeFilter = (string, pattern) => {
   return string.toLowerCase().includes(pattern.toLowerCase())
@@ -11,8 +12,14 @@ const includeFilter = (string, pattern) => {
 
 const filterActions = (input) => {
   return choices.filter((choice) => {
+    // Match symbol as well as value
+    const string = choice.symbol + choice.value
     // Initial input is undefined, so we do not filter at all for that
-    return input ? includeFilter(choice.name, input) : true
+    return input ? includeFilter(string, input) : true
+  }).map((choice) => {
+    return Object.assign(choice, {
+      name: `${choice.symbol} ${utils.capitalize(choice.value)}`,
+    })
   })
 }
 
