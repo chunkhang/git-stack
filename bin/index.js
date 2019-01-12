@@ -1,3 +1,20 @@
 #!/usr/bin/env node
 
-console.log('Hello World!')
+const inquirer = require('inquirer')
+
+const { choices, actions } = require('../lib')
+
+const main = async () => {
+  const answers = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'action',
+      message: 'Which action to perform?',
+      choices,
+    },
+  ])
+  const action = actions[answers.action]
+  action()
+}
+
+main()
