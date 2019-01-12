@@ -4,6 +4,7 @@
   ],
   "rules": {
     "semi": ["error", "never"],
-    "no-console": "off"
+    "no-console": "off",
+    "arrow-body-style": "off"
   }
 }
