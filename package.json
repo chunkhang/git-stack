@@ -33,8 +33,7 @@
     "commander": "^2.19.0",
     "execa": "^1.0.0",
     "inquirer": "^6.2.1",
-    "inquirer-autocomplete-prompt": "^1.0.1",
-    "opn": "^5.4.0"
+    "inquirer-autocomplete-prompt": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
