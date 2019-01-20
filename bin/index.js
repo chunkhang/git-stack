@@ -5,7 +5,7 @@ const autocomplete = require('inquirer-autocomplete-prompt')
 
 const pkg = require('../package.json')
 const { choices, actions } = require('../lib/actions')
-const utils = require('../lib/utils')
+const { capitalize } = require('../lib/utils')
 const { VERSION_ARGS } = require('../lib/constants')
 
 const includeFilter = (string, pattern) => {
@@ -20,7 +20,7 @@ const filterActions = (input) => {
     return input ? includeFilter(string, input) : true
   }).map((choice) => {
     return Object.assign(choice, {
-      name: `${choice.symbol} ${utils.capitalize(choice.value)}`,
+      name: `${choice.symbol} ${capitalize(choice.value)}`,
     })
   })
 }
@@ -32,7 +32,7 @@ const main = async () => {
     const answers = await inquirer.prompt({
       type: 'autocomplete',
       name: 'action',
-      message: 'Which action to perform?',
+      message: 'Choose action:',
       source: async (_, input) => filterActions(input),
     })
     const action = actions[answers.action]
