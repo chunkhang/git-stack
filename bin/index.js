@@ -1,44 +1,70 @@
 #!/usr/bin/env node
 
+const execa = require('execa')
 const inquirer = require('inquirer')
-const autocomplete = require('inquirer-autocomplete-prompt')
 
 const pkg = require('../package.json')
-const { choices, actions } = require('../lib/actions')
-const { capitalize } = require('../lib/utils')
 const { VERSION_ARGS } = require('../lib/constants')
 
-const includeFilter = (string, pattern) => {
-  return string.toLowerCase().includes(pattern.toLowerCase())
+const STASHES = []
+const SEPARATOR = new inquirer.Separator()
+const ADD = {
+  name: '+ Add stash',
+  value: 'add',
+  short: 'Add stash',
+}
+const CLEAR = {
+  name: 'x Clear stashes',
+  value: 'clear',
+  short: 'Clear stashes',
 }
 
-const filterActions = (input) => {
-  return choices.filter((choice) => {
-    // Match symbol as well as value
-    const string = choice.symbol + choice.value
-    // Initial input is undefined, so we do not filter at all for that
-    return input ? includeFilter(string, input) : true
-  }).map((choice) => {
-    return Object.assign(choice, {
-      name: `${choice.symbol} ${capitalize(choice.value)}`,
-    })
+const getItems = async () => {
+  let hasStashes = true
+  // Get details of all stashes
+  const commands = {
+    dates: await execa('git', ['stash', 'list', '--pretty=format:%ar']),
+    messages: await execa('git', ['stash', 'list', '--pretty=format:%s']),
+  }
+  const details = {}
+  Object.entries(commands).forEach((entry) => {
+    const command = entry[0]
+    const result = entry[1]
+    // No stashes
+    if (result.stdout === '') hasStashes = false
+    details[command] = result.stdout.split('\n')
   })
+  let items = [ADD]
+  if (hasStashes) {
+    // Construct stashes
+    for (let i = 0; i < details.dates.length; i++) {
+      const date = details.dates[i]
+      const message = details.messages[i]
+      const stash = {
+        name: `* ${message} (${date})`,
+        value: i,
+        short: message,
+      }
+      STASHES.push(stash)
+    }
+    items = items.concat(SEPARATOR, STASHES, SEPARATOR, CLEAR)
+  }
+  return items
 }
 
 const main = async () => {
   if (process.argv.length < 3) {
-    // Main entry point
-    inquirer.registerPrompt('autocomplete', autocomplete)
+    /* Main entry point */
+    // Choose stash or action
     const answers = await inquirer.prompt({
-      type: 'autocomplete',
-      name: 'action',
-      message: 'Choose action:',
-      source: async (_, input) => filterActions(input),
+      type: 'list',
+      name: 'item',
+      message: 'Choose a stash or action:',
+      choices: await getItems(),
     })
-    const action = actions[answers.action]
-    action()
+    console.log(answers.item)
   } else if (VERSION_ARGS.includes(process.argv[2])) {
-    // Version
+    /* Version */
     console.log(pkg.version)
   }
 }
