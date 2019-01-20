@@ -31,8 +31,7 @@
   },
   "dependencies": {
     "execa": "^1.0.0",
-    "inquirer": "^6.2.1",
-    "inquirer-autocomplete-prompt": "^1.0.1"
+    "inquirer": "^6.2.1"
   },
   "devDependencies": {
     "eslint": "^5.12.0",
