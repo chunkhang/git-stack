@@ -30,7 +30,6 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "commander": "^2.19.0",
     "execa": "^1.0.0",
     "inquirer": "^6.2.1",
     "inquirer-autocomplete-prompt": "^1.0.1"
