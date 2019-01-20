@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-const program = require('commander')
 const inquirer = require('inquirer')
 const autocomplete = require('inquirer-autocomplete-prompt')
-const opn = require('opn')
 
 const pkg = require('../package.json')
 const { choices, actions } = require('../lib/actions')
 const utils = require('../lib/utils')
+const { VERSION_ARGS } = require('../lib/constants')
 
 const includeFilter = (string, pattern) => {
   return string.toLowerCase().includes(pattern.toLowerCase())
@@ -38,39 +37,9 @@ const main = async () => {
     })
     const action = actions[answers.action]
     action()
-  } else {
-    // Subcommands
-    program
-      .command('version')
-      .description('display version')
-      .action(() => {
-        console.log(pkg.version)
-      })
-    program
-      .command('readme')
-      .description('open home page in browser')
-      .action(() => {
-        console.log(pkg.homepage)
-        opn(pkg.homepage, {
-          wait: false,
-        })
-      })
-    program
-      .command('issues')
-      .description('open issues page in browser')
-      .action(() => {
-        console.log(pkg.bugs)
-        opn(pkg.bugs, {
-          wait: false,
-        })
-      })
-    program
-      .command('help')
-      .description('display help')
-      .action(() => {
-        program.help()
-      })
-    program.parse(process.argv)
+  } else if (VERSION_ARGS.includes(process.argv[2])) {
+    // Version
+    console.log(pkg.version)
   }
 }
 
