@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-const execa = require('execa')
 const inquirer = require('inquirer')
 
 const pkg = require('../package.json')
+const { listStashes } = require('../lib/stashes')
 const { VERSION_ARGS } = require('../lib/constants')
 
-const STASHES = []
+let STASHES
 const SEPARATOR = new inquirer.Separator()
 const ADD = {
   name: '+ Add stash',
@@ -20,34 +20,19 @@ const CLEAR = {
 }
 
 const getItems = async () => {
-  let hasStashes = true
-  // Get details of all stashes
-  const commands = {
-    dates: await execa('git', ['stash', 'list', '--pretty=format:%ar']),
-    messages: await execa('git', ['stash', 'list', '--pretty=format:%s']),
-  }
-  const details = {}
-  Object.entries(commands).forEach((entry) => {
-    const command = entry[0]
-    const result = entry[1]
-    // No stashes
-    if (result.stdout === '') hasStashes = false
-    details[command] = result.stdout.split('\n')
-  })
-  let items = [ADD]
-  if (hasStashes) {
-    // Construct stashes
-    for (let i = 0; i < details.dates.length; i++) {
-      const date = details.dates[i]
-      const message = details.messages[i]
-      const stash = {
-        name: `* ${message} (${date})`,
-        value: i,
-        short: message,
+  let items
+  const stashes = await listStashes()
+  if (stashes.length > 0) {
+    STASHES = stashes.map((stash, index) => {
+      return {
+        name: `* ${stash.message} (${stash.date})`,
+        value: index,
+        short: stash.message,
       }
-      STASHES.push(stash)
-    }
-    items = items.concat(SEPARATOR, STASHES, SEPARATOR, CLEAR)
+    })
+    items = [ADD, SEPARATOR, ...STASHES, SEPARATOR, CLEAR]
+  } else {
+    items = [ADD]
   }
   return items
 }
