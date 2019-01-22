@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
-const inquirer = require('inquirer')
-
 const pkg = require('../package.json')
-const { listStashes, clearStashes } = require('../lib/stashes')
+const { listStashes, clearStashes } = require('../lib/stash')
+const { select, confirm, separator } = require('../lib/inquirer')
 const { VERSION_ARGS } = require('../lib/constants')
 
 let STASHES
-const SEPARATOR = new inquirer.Separator()
 const ADD = {
   name: '+ Add stash',
   value: 'add',
@@ -19,8 +17,8 @@ const CLEAR = {
   short: 'Clear stashes',
 }
 
-const getItems = async () => {
-  let items
+const getChoices = async () => {
+  let choices = [ADD]
   const stashes = await listStashes()
   if (stashes.length > 0) {
     STASHES = stashes.map((stash, index) => {
@@ -30,37 +28,33 @@ const getItems = async () => {
         short: stash.message,
       }
     })
-    items = [ADD, SEPARATOR, ...STASHES, SEPARATOR, CLEAR]
-  } else {
-    items = [ADD]
+    choices = choices.concat(separator, STASHES, separator, CLEAR)
   }
-  return items
+  return choices
 }
 
 const main = async () => {
   if (process.argv.length < 3) {
-    /* Main entry point */
     // Choose stash or action
-    const answers = await inquirer.prompt({
-      type: 'list',
-      name: 'item',
-      message: 'Choose a stash or action:',
-      choices: await getItems(),
-    })
-    const choice = answers.item
+    const choice = await select(
+      'Choose a stash or action',
+      await getChoices,
+    )
     // Action chosen
     if (typeof choice === 'string') {
       // Clear stashes
       if (choice === 'clear') {
-        await clearStashes()
-        console.log('Cleared all stashes')
+        if (await confirm()) {
+          await clearStashes()
+          console.log('Done')
+        }
       }
     // Stash chosen
     } else {
       console.log(choice)
     }
   } else if (VERSION_ARGS.includes(process.argv[2])) {
-    /* Version */
+    // Version
     console.log(pkg.version)
   }
 }
