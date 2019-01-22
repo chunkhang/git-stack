@@ -3,7 +3,7 @@
 const inquirer = require('inquirer')
 
 const pkg = require('../package.json')
-const { listStashes } = require('../lib/stashes')
+const { listStashes, clearStashes } = require('../lib/stashes')
 const { VERSION_ARGS } = require('../lib/constants')
 
 let STASHES
@@ -47,7 +47,18 @@ const main = async () => {
       message: 'Choose a stash or action:',
       choices: await getItems(),
     })
-    console.log(answers.item)
+    const choice = answers.item
+    // Action chosen
+    if (typeof choice === 'string') {
+      // Clear stashes
+      if (choice === 'clear') {
+        await clearStashes()
+        console.log('Cleared all stashes')
+      }
+    // Stash chosen
+    } else {
+      console.log(choice)
+    }
   } else if (VERSION_ARGS.includes(process.argv[2])) {
     /* Version */
     console.log(pkg.version)
