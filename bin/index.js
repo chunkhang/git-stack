@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const pkg = require('../package.json')
-const { listStashes, addStash, clearStashes } = require('../lib/git')
-const { select, confirm, input, separator } = require('../lib/inquirer')
+const git = require('../lib/git')
+const inquirer = require('../lib/inquirer')
 const { VERSION_ARGS, SYMBOLS, DEFAULT_STASH_NAME } = require('../lib/constants')
 
 let STASHES
@@ -19,7 +19,7 @@ const CLEAR = {
 
 const getChoices = async () => {
   let choices = [ADD]
-  const stashes = await listStashes()
+  const stashes = await git.listStashes()
   if (stashes.length > 0) {
     STASHES = stashes.map((stash, index) => {
       return {
@@ -28,7 +28,12 @@ const getChoices = async () => {
         short: stash.message,
       }
     })
-    choices = choices.concat(separator, STASHES, separator, CLEAR)
+    choices = choices.concat(
+      inquirer.separator,
+      STASHES,
+      inquirer.separator,
+      CLEAR,
+    )
   }
   return choices
 }
@@ -36,7 +41,7 @@ const getChoices = async () => {
 const main = async () => {
   if (process.argv.length < 3) {
     // Choose stash or action
-    const choice = await select(
+    const choice = await inquirer.select(
       'Choose a stash or action',
       await getChoices,
     )
@@ -44,13 +49,16 @@ const main = async () => {
     if (typeof choice === 'string') {
       // Add stash
       if (choice === 'add') {
-        const message = await input('Name the stash') || DEFAULT_STASH_NAME
-        await addStash(message)
-        console.log('Stashed!')
+        const message = await inquirer.input('Name the stash') || DEFAULT_STASH_NAME
+        if (await git.addStash(message)) {
+          console.log('Stashed!')
+        } else {
+          console.log('Nothing to stash!')
+        }
       // Clear stashes
       } else if (choice === 'clear') {
-        if (await confirm()) {
-          await clearStashes()
+        if (await inquirer.confirm()) {
+          await git.clearStashes()
           console.log('Poof!')
         }
       }
