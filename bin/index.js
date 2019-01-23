@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
 const pkg = require('../package.json')
-const { listStashes, clearStashes } = require('../lib/stash')
-const { select, confirm, separator } = require('../lib/inquirer')
-const { VERSION_ARGS } = require('../lib/constants')
+const { listStashes, addStash, clearStashes } = require('../lib/git')
+const { select, confirm, input, separator } = require('../lib/inquirer')
+const { VERSION_ARGS, SYMBOLS, DEFAULT_STASH_NAME } = require('../lib/constants')
 
 let STASHES
 const ADD = {
-  name: '+ Add stash',
+  name: `${SYMBOLS.ADD} Add`,
   value: 'add',
   short: 'Add stash',
 }
 const CLEAR = {
-  name: 'x Clear stashes',
+  name: `${SYMBOLS.CLEAR} Clear`,
   value: 'clear',
   short: 'Clear stashes',
 }
@@ -23,7 +23,7 @@ const getChoices = async () => {
   if (stashes.length > 0) {
     STASHES = stashes.map((stash, index) => {
       return {
-        name: `* ${stash.message} (${stash.date})`,
+        name: `${SYMBOLS.STASH} ${stash.message} (${stash.date})`,
         value: index,
         short: stash.message,
       }
@@ -42,11 +42,16 @@ const main = async () => {
     )
     // Action chosen
     if (typeof choice === 'string') {
+      // Add stash
+      if (choice === 'add') {
+        const message = await input('Name the stash') || DEFAULT_STASH_NAME
+        await addStash(message)
+        console.log('Stashed!')
       // Clear stashes
-      if (choice === 'clear') {
+      } else if (choice === 'clear') {
         if (await confirm()) {
           await clearStashes()
-          console.log('Done')
+          console.log('Poof!')
         }
       }
     // Stash chosen
