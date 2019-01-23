@@ -3,6 +3,7 @@
 const pkg = require('../package.json')
 const git = require('../lib/git')
 const inquirer = require('../lib/inquirer')
+const { print } = require('../lib/utils')
 const { VERSION_ARGS, SYMBOLS, DEFAULT_MESSAGE } = require('../lib/constants')
 
 let STASHES
@@ -41,6 +42,7 @@ const getChoices = async () => {
 const main = async () => {
   if (process.argv.length < 3) {
     // Choose stash or action
+    // TODO: Autocomplete select
     const choice = await inquirer.select(
       'Choose a stash or action',
       await getChoices,
@@ -51,20 +53,20 @@ const main = async () => {
       if (choice === 'add') {
         const message = await inquirer.input('Name the stash') || DEFAULT_MESSAGE
         if (await git.addStash(message)) {
-          console.log('Stashed!')
+          print('Stashed!')
         } else {
-          console.log('Nothing to stash!')
+          print('Nothing to stash!')
         }
       // Clear stashes
       } else if (choice === 'clear') {
         if (await inquirer.confirm()) {
           await git.clearStashes()
-          console.log('Poof!')
+          print('Poof!')
         }
       }
     // Stash chosen
     } else {
-      console.log(choice)
+      print(choice)
     }
   } else if (VERSION_ARGS.includes(process.argv[2])) {
     // Version
