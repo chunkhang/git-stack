@@ -6,6 +6,9 @@
     "semi": ["error", "never"],
     "no-console": "off",
     "arrow-body-style": "off",
-    "no-plusplus": "off"
+    "no-plusplus": "off",
+    "object-curly-newline": ["error", {
+      "ImportDeclaration": "never"
+    }]
   }
 }
