@@ -3,7 +3,7 @@
 const pkg = require('../package.json')
 const git = require('../lib/git')
 const inquirer = require('../lib/inquirer')
-const { VERSION_ARGS, SYMBOLS, DEFAULT_STASH_NAME } = require('../lib/constants')
+const { VERSION_ARGS, SYMBOLS, DEFAULT_MESSAGE } = require('../lib/constants')
 
 let STASHES
 const ADD = {
@@ -49,7 +49,7 @@ const main = async () => {
     if (typeof choice === 'string') {
       // Add stash
       if (choice === 'add') {
-        const message = await inquirer.input('Name the stash') || DEFAULT_STASH_NAME
+        const message = await inquirer.input('Name the stash') || DEFAULT_MESSAGE
         if (await git.addStash(message)) {
           console.log('Stashed!')
         } else {
