@@ -19,7 +19,7 @@ const CLEAR = {
 }
 
 const getChoices = async () => {
-  let choices = [PUSH]
+  let choices
   const stashes = await git.listStashes()
   if (stashes.length > 0) {
     STASHES = stashes.map((stash, index) => {
@@ -29,12 +29,9 @@ const getChoices = async () => {
         short: stash.message,
       }
     })
-    choices = choices.concat(
-      inquirer.separator,
-      STASHES,
-      inquirer.separator,
-      CLEAR,
-    )
+    choices = [...STASHES, PUSH, CLEAR]
+  } else {
+    choices = [PUSH]
   }
   return choices
 }
@@ -62,7 +59,6 @@ const getStashActions = () => {
 const main = async () => {
   if (process.argv.length < 3) {
     // Choose stash or action
-    // TODO: Autocomplete select
     const choice = await inquirer.select(
       'Choose a stash or action',
       await getChoices(),
