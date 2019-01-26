@@ -64,10 +64,8 @@ const main = async () => {
       'Choose a stash or action',
       await getChoices(),
     )
-
     // Action chosen
     if (typeof choice === 'string') {
-
       if (choice === 'push') {
         const message = await inquirer.input('Name the stash') || DEFAULT_MESSAGE
         if (await git.pushStash(message)) {
@@ -75,14 +73,12 @@ const main = async () => {
         } else {
           print('Nothing to stash!')
         }
-
       } else if (choice === 'clear') {
         if (await inquirer.confirm()) {
           await git.clearStashes()
           print('Poof!')
         }
       }
-
     // Stash chosen
     } else {
       const index = choice
@@ -91,20 +87,16 @@ const main = async () => {
         'Choose an action for stash',
         getStashActions(),
       )
-
       if (action === 'show') {
         await git.showStash(index)
-
       } else if (action === 'pop') {
         await git.popStash(index)
         print('Pop!')
-
       } else if (action === 'drop') {
         await git.dropStash(index)
         print('Poof!')
       }
     }
-
   } else if (VERSION_ARGS.includes(process.argv[2])) {
     // Version
     console.log(pkg.version)
