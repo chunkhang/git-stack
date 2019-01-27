@@ -9,6 +9,7 @@
     "no-plusplus": "off",
     "object-curly-newline": ["error", {
       "ImportDeclaration": "never"
-    }]
+    }],
+    "no-await-in-loop": "off"
   }
 }
