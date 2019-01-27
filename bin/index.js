@@ -6,17 +6,23 @@ const inquirer = require('../lib/inquirer')
 const { print } = require('../lib/utils')
 const { VERSION_ARGS, SYMBOLS, DEFAULT_MESSAGE } = require('../lib/constants')
 
-const getChoices = async () => {
+const getMainChoices = async () => {
   const push = {
     symbol: SYMBOLS.PUSH,
     name: 'Push',
-    value: 'push',
+    value: {
+      type: 'action',
+      action: 'push',
+    },
     short: 'Push stash',
   }
   const clear = {
     symbol: SYMBOLS.CLEAR,
     name: 'Clear',
-    value: 'clear',
+    value: {
+      type: 'action',
+      action: 'clear',
+    },
     message: 'Clear stashes',
   }
   const stashList = await git.listStashes()
@@ -25,8 +31,14 @@ const getChoices = async () => {
       return {
         symbol: SYMBOLS.STASH,
         name: `${stash.message} (${stash.date})`,
-        value: index,
-        short: stash.message,
+        value: {
+          type: 'stash',
+          stash: {
+            index,
+            message: stash.message,
+          },
+        },
+        short: 'Open stash',
       }
     })
     return [...stashes, push, clear]
@@ -59,42 +71,47 @@ const getStashActions = () => {
 
 const main = async () => {
   if (process.argv.length < 3) {
-    // Choose stash or action
-    const choice = await inquirer.select(
-      'Choose a stash or action',
-      await getChoices(),
-    )
-    // Action chosen
-    if (typeof choice === 'string') {
-      if (choice === 'push') {
-        const message = await inquirer.input('Name the stash') || DEFAULT_MESSAGE
-        if (await git.pushStash(message)) {
-          print('Stashed!')
-        } else {
-          print('Nothing to stash!')
-        }
-      } else if (choice === 'clear') {
-        if (await inquirer.confirm()) {
-          await git.clearStashes()
-          print('Poof!')
-        }
-      }
-    // Stash chosen
-    } else {
-      const index = choice
-      // Choose action for stash
-      const action = await inquirer.select(
-        'Choose an action for stash',
-        getStashActions(),
+    for (;;) {
+      const mainChoice = await inquirer.select(
+        'MAIN MENU',
+        await getMainChoices(),
       )
-      if (action === 'show') {
-        await git.showStash(index)
-      } else if (action === 'pop') {
-        await git.popStash(index)
-        print('Pop!')
-      } else if (action === 'drop') {
-        await git.dropStash(index)
-        print('Poof!')
+      if (mainChoice.type === 'action') {
+        const { action } = mainChoice
+        if (action === 'push') {
+          const message = await inquirer.input('Stash name') || DEFAULT_MESSAGE
+          if (await git.pushStash(message)) {
+            print('Stashed!')
+          } else {
+            print('Nothing to stash!')
+            break
+          }
+        } else if (action === 'clear') {
+          if (await inquirer.confirm()) {
+            await git.clearStashes()
+            print('Poof!')
+            break
+          }
+        }
+      } else if (mainChoice.type === 'stash') {
+        const { index, message } = mainChoice.stash
+        for (;;) {
+          const action = await inquirer.select(
+            `STASH - ${message}`,
+            getStashActions(),
+          )
+          if (action === 'show') {
+            await git.showStash(index)
+          } else if (action === 'pop') {
+            await git.popStash(index)
+            print('Pop!')
+            break
+          } else if (action === 'drop') {
+            await git.dropStash(index)
+            print('Poof!')
+            break
+          }
+        }
       }
     }
   } else if (VERSION_ARGS.includes(process.argv[2])) {
