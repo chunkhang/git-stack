@@ -23,7 +23,7 @@ const getMainChoices = async () => {
       type: 'action',
       action: 'clear',
     },
-    message: 'Clear stashes',
+    short: 'Clear stashes',
   }
   const stashList = await git.listStashes()
   if (stashList.length > 0) {
@@ -38,7 +38,7 @@ const getMainChoices = async () => {
             message: stash.message,
           },
         },
-        short: 'Open stash',
+        short: 'Go to stash',
       }
     })
     return [...stashes, push, clear]
@@ -66,6 +66,12 @@ const getStashActions = () => {
       value: 'drop',
       short: 'Drop stash',
     },
+    {
+      symbol: SYMBOLS.BACK,
+      name: 'Back',
+      value: 'back',
+      short: 'Back to main menu',
+    },
   ]
 }
 
@@ -84,7 +90,6 @@ const main = async () => {
             print('Stashed!')
           } else {
             print('Nothing to stash!')
-            break
           }
         } else if (action === 'clear') {
           if (await inquirer.confirm()) {
@@ -109,6 +114,8 @@ const main = async () => {
           } else if (action === 'drop') {
             await git.dropStash(index)
             print('Poof!')
+            break
+          } else if (action === 'back') {
             break
           }
         }
