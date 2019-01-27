@@ -39,7 +39,7 @@ const getMainChoices = async () => {
     const stashes = stashList.map((stash, index) => {
       return {
         symbol: SYMBOLS.STASH,
-        name: `${stash.message} (${stash.date})`,
+        name: `Stash - ${stash.message} (${stash.date})`,
         value: {
           type: 'stash',
           stash: {
@@ -96,15 +96,14 @@ const main = async () => {
         if (action === 'push') {
           const message = await inquirer.input('Stash name') || DEFAULT_MESSAGE
           if (await git.pushStash(message)) {
-            print('Stashed!')
+            print('Pushed!')
           } else {
-            print('Nothing to stash!')
+            print('Nothing to push!')
           }
         } else if (action === 'clear') {
           if (await inquirer.confirm()) {
             await git.clearStashes()
             print('Poof!')
-            break
           }
         } else if (action === 'quit') {
           break
@@ -120,7 +119,7 @@ const main = async () => {
             await git.showStash(index)
           } else if (action === 'pop') {
             await git.popStash(index)
-            print('Pop!')
+            print('Popped!')
             break
           } else if (action === 'drop') {
             await git.dropStash(index)
