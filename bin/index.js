@@ -25,6 +25,15 @@ const getMainChoices = async () => {
     },
     short: 'Clear stashes',
   }
+  const quit = {
+    symbol: SYMBOLS.QUIT,
+    name: 'Quit',
+    value: {
+      type: 'action',
+      action: 'quit',
+    },
+    short: 'Quit',
+  }
   const stashList = await git.listStashes()
   if (stashList.length > 0) {
     const stashes = stashList.map((stash, index) => {
@@ -41,9 +50,9 @@ const getMainChoices = async () => {
         short: 'Go to stash',
       }
     })
-    return [...stashes, push, clear]
+    return [...stashes, push, clear, quit]
   }
-  return [push]
+  return [push, quit]
 }
 
 const getStashActions = () => {
@@ -97,6 +106,8 @@ const main = async () => {
             print('Poof!')
             break
           }
+        } else if (action === 'quit') {
+          break
         }
       } else if (mainChoice.type === 'stash') {
         const { index, message } = mainChoice.stash
