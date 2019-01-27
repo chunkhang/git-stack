@@ -85,8 +85,13 @@ const getStashActions = () => {
 }
 
 const main = async () => {
+  // Check whether in git repository
+  if (!await git.checkRepository()) {
+    process.exit(1)
+  }
   if (process.argv.length < 3) {
     for (;;) {
+      // Main menu
       const mainChoice = await inquirer.select(
         'MAIN MENU',
         await getMainChoices(),
@@ -111,6 +116,7 @@ const main = async () => {
       } else if (mainChoice.type === 'stash') {
         const { index, message } = mainChoice.stash
         for (;;) {
+          // Stash
           const action = await inquirer.select(
             `STASH - ${message}`,
             getStashActions(),
