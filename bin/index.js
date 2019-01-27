@@ -111,7 +111,7 @@ const main = async () => {
             print('Poof!')
           }
         } else if (action === 'quit') {
-          break
+          process.exit()
         }
       } else if (mainChoice.type === 'stash') {
         const { index, message } = mainChoice.stash
