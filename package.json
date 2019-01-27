@@ -24,6 +24,7 @@
   "engines": {
     "node": ">=8"
   },
+  "preferGlobal": true,
   "scripts": {
     "pretest": "npm run lint",
     "test": "echo 'No test yet'",
